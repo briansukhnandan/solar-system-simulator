@@ -1,34 +1,14 @@
 "use client"
-import * as THREE from 'three'
-import React, { useRef, useState } from 'react'
-import { Canvas, useFrame, ThreeElements, useLoader } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei';
+import * as THREE from "three";
+import * as Constants from "./utils/constants";
+import React, { useRef } from "react";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber"
+import { OrbitControls } from "@react-three/drei";
+import { EntityProps, OrbitProps, Planets } from "./utils/types";
 
-type BaseThreeMeshProps = ThreeElements["mesh"];
-type OrbitProps = BaseThreeMeshProps & { radius: number; };
-type EntityProps = BaseThreeMeshProps & {
-  name: string;
-  size: number;
-  rotationSpeed: number;
-  texture: string;
-  revolutionSpeed?: number;
-};
-
-const UNIT_SIZE = 10; // 69634 km
-const UNIT_ROTATION_SPEED = 0.0005;
-
-const SUN_BASE_SIZE = UNIT_SIZE;
-const SUN_BASE_ROTATION_SPEED = UNIT_ROTATION_SPEED;
-
-const MERCURY_DISTANCE = 1.8 * UNIT_SIZE;
-const MERCURY_SIZE = SUN_BASE_SIZE / 200;
-
-
-// 36,826,000 
-
-const Orbit = (props: OrbitProps) => {
+const OrbitMesh = (props: OrbitProps) => {
   const ref = useRef<THREE.Mesh>(null!)
-  useFrame((_state, delta) => (ref.current.rotation.x += 0))
+  useFrame((_state, _delta) => (ref.current.rotation.x += 0))
   return (
     <mesh
       {...props}
@@ -40,11 +20,11 @@ const Orbit = (props: OrbitProps) => {
   );
 }
 
-const Entity = (props: EntityProps) => {
+const EntityMesh = (props: EntityProps & { children?: React.ReactNode }) => {
   const ref = useRef<THREE.Mesh>(null!)
   const colorMap = useLoader(THREE.TextureLoader, props.texture)
   
-  useFrame((_state, delta) => {
+  useFrame((_state) => {
     ref.current.rotation.y += props.rotationSpeed
   });
 
@@ -52,37 +32,61 @@ const Entity = (props: EntityProps) => {
     <mesh
       {...props}
       ref={ref}
-      // Most meshes need this it seems like.
       rotation={[Math.PI / 2, 0, 0]}
     >
       <sphereGeometry args={[props.size]} />
       <meshStandardMaterial map={colorMap}/>
+      { props.children }
     </mesh>
+  );
+}
+
+const Planet = <T extends Planets>({ planet }: { planet: T }) => {
+  const {
+    name,
+    distance, 
+    size, 
+    rotationSpeed, 
+    revolutionPeriod,
+    texture
+  } = Constants.PlanetInformationMap[planet];
+  
+  return (
+    <>
+      <OrbitMesh radius={distance} position={[0,0,0]}/>
+      <EntityMesh
+        name={name}
+        position={[distance,0,0]}
+        size={size}
+        rotationSpeed={rotationSpeed}
+        texture={texture}
+      />
+    </>
   );
 }
 
 const SolarSystem = () => {
   return (
     <>
-      <Orbit radius={MERCURY_DISTANCE} position={[0,0,0]}/>
-      <Entity 
+      <EntityMesh 
         name="Sun"
         position={[0,0,0]}
-        size={SUN_BASE_SIZE}
-        rotationSpeed={SUN_BASE_ROTATION_SPEED}
+        size={Constants.SUN_BASE_SIZE}
+        rotationSpeed={Constants.SUN_BASE_ROTATION_SPEED}
         texture="textures/sun.jpg"
       />
+      <Planet planet={Planets.Mercury} />
+      <Planet planet={Planets.Venus} />
+      <Planet planet={Planets.Earth} />
+      <Planet planet={Planets.Mars} />
     </>
-  )
+  );
 }
 
-const Lighting = () => {
-  return (<>
-    <ambientLight />
-    {/* <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} /> */}
-    {/* <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} /> */}
-  </>)
-}
+const Lighting = () => (
+  <ambientLight />
+);
+
 
 export default function Home() {
   return (
