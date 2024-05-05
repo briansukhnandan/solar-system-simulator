@@ -195,9 +195,33 @@ const Background = () => {
   )
 }
 
-export default function Home() {
+const NavBar = () => {
   return (
-    <div style={{width: "auto", height: "100vh"}}>
+    <div style={{
+      paddingTop: "5px",
+      textAlign: "center",
+      fontStyle: "italic",
+    }}>
+      <div>💫 The Solar System 🌙</div>
+    </div>
+  );
+}
+
+const Footer = () => {
+  return (
+    <div style={{ paddingLeft: "8px" }}>
+      <a href="https://briansukhnandan.xyz">
+        See more of my work!
+      </a>
+    </div>
+  )
+}
+
+export default function Home() {
+  // 92vh to get rid of the scrollbar on the right.
+  return (
+    <div style={{width: "auto", height: "92vh"}}>
+      <NavBar />
       <Canvas camera={{ position: [0, 0, 100]  }}>
         <Suspense fallback={null}>
           <Background />
@@ -206,6 +230,7 @@ export default function Home() {
         <SolarSystem />
         <OrbitControls />
       </Canvas>
+      <Footer />
     </div>
   );
 }
