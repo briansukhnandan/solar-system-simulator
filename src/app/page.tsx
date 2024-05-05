@@ -1,10 +1,12 @@
 "use client"
 import * as THREE from "three";
 import * as Constants from "./utils/constants";
-import React, { Suspense, useRef } from "react";
+import React, { Suspense, useRef, useState } from "react";
 import { Canvas, Vector3, useFrame, useLoader, useThree } from "@react-three/fiber"
 import { OrbitControls, useTexture } from "@react-three/drei";
-import { BaseThreeMeshProps, EntityProps, OrbitProps, Planets } from "./utils/types";
+import { BaseThreeMeshProps, EntityProps, OrbitProps, Planets, getPlanetName } from "./utils/types";
+import { Tooltip, Button } from "@material-tailwind/react";
+import { PlanetTooltips } from "./tooltips";
 
 const OrbitMesh = (props: OrbitProps) => {
   const ref = useRef<THREE.Mesh>(null!)
@@ -28,10 +30,15 @@ const EntityMesh = (props: EntityProps) => {
     ref.current.rotation.y += props.rotationSpeed
   });
 
+  const meshProps = {
+    ref,
+    ...props,
+    ...(props.onClickHandler ? {onClick: props.onClickHandler} : {})
+  };
+
   return (
     <mesh
-      {...props}
-      ref={ref}
+      {...meshProps}
     >
       <sphereGeometry args={[props.size]} />
       <meshStandardMaterial map={colorMap}/>
@@ -89,7 +96,7 @@ const Moons = (props: BaseThreeMeshProps & {
     <group>
       <PivotObject position={props.position}>
         {
-          Array.from(Array(FINAL_MOON_COUNT), () => ({})).map(_ => {
+          Array.from(Array(FINAL_MOON_COUNT), () => ({})).map((_, moonIdx) => {
             const randomIsNegative = [-1, 1][Math.floor(Math.random() * 2)];
             const moonVector: Vector3 = [
               props.planetDistance + randomIsNegative * (getRandomInt(-1*props.planetSize, props.planetSize) + 2*props.planetSize),
@@ -99,7 +106,7 @@ const Moons = (props: BaseThreeMeshProps & {
 
             return (
               <EntityMesh
-                key={props.planetDistance}
+                key={`${props.planetDistance}_${moonIdx}`}
                 name={"Moon"}
                 position={moonVector}
                 size={props.planetSize / 10}
@@ -114,7 +121,13 @@ const Moons = (props: BaseThreeMeshProps & {
   )
 }
 
-const Planet = <T extends Planets>({ planet }: { planet: T }) => {
+const Planet = <T extends Planets>({ 
+  planet,
+  onClickHandler
+}: {
+  planet: T,
+  onClickHandler: () => void
+}) => {
   const {
     name,
     distance,
@@ -138,6 +151,7 @@ const Planet = <T extends Planets>({ planet }: { planet: T }) => {
           size={PLANET_SIZE_SCALE * size}
           rotationSpeed={rotationSpeed}
           texture={texture}
+          onClickHandler={onClickHandler}
         />
         <Moons
           moonCount={moonCount}
@@ -159,7 +173,7 @@ const Planet = <T extends Planets>({ planet }: { planet: T }) => {
   );
 }
 
-const SolarSystem = () => {
+const SolarSystem = ({ onClickHandler }: { onClickHandler: (planet: Planets) => void; }) => {
   return (
     <>
       <EntityMesh
@@ -169,21 +183,17 @@ const SolarSystem = () => {
         rotationSpeed={Constants.SUN_BASE_ROTATION_SPEED}
         texture="textures/sun.jpg"
       />
-      <Planet planet={Planets.Mercury} />
-      <Planet planet={Planets.Venus} />
-      <Planet planet={Planets.Earth} />
-      <Planet planet={Planets.Mars} />
-      <Planet planet={Planets.Jupiter} />
-      <Planet planet={Planets.Saturn} />
-      <Planet planet={Planets.Uranus} />
-      <Planet planet={Planets.Neptune} />
+      <Planet planet={Planets.Mercury} onClickHandler={() => onClickHandler(Planets.Mercury)} />
+      <Planet planet={Planets.Venus} onClickHandler={() => onClickHandler(Planets.Venus)}/>
+      <Planet planet={Planets.Earth} onClickHandler={() => onClickHandler(Planets.Earth)}/>
+      <Planet planet={Planets.Mars} onClickHandler={() => onClickHandler(Planets.Mars)}/>
+      <Planet planet={Planets.Jupiter} onClickHandler={() => onClickHandler(Planets.Jupiter)}/>
+      <Planet planet={Planets.Saturn} onClickHandler={() => onClickHandler(Planets.Saturn)}/>
+      <Planet planet={Planets.Uranus} onClickHandler={() => onClickHandler(Planets.Uranus)}/>
+      <Planet planet={Planets.Neptune} onClickHandler={() => onClickHandler(Planets.Neptune)}/>
     </>
   );
 }
-
-const Lighting = () => (
-  <ambientLight />
-);
 
 const Background = () => {
   const { gl } = useThree();
@@ -208,30 +218,41 @@ const NavBar = () => {
   );
 }
 
-const Footer = () => {
+const Footer = ({ selectedPlanet }: { selectedPlanet: Planets | undefined }) => {
   return (
-    <div style={{ paddingLeft: "8px" }}>
-      <a href="https://briansukhnandan.xyz">
-        See more of my work!
-      </a>
+    <div>
+      <div style={{ paddingLeft: "8px", float: "left" }}>
+        <a href="https://briansukhnandan.xyz">
+          See more of my work!
+        </a>
+      </div>
+      <div style={{ paddingRight: "8px", float: "right" }}>
+        { selectedPlanet ? (
+          <Tooltip content={PlanetTooltips[selectedPlanet]}>
+            <Button placeholder={""}>Hover me for Info about {getPlanetName(selectedPlanet)}!</Button>
+          </Tooltip>
+        ) : "Click on a Planet to see Details!" }
+      </div>
     </div>
   )
 }
 
 export default function Home() {
+  const [selectedPlanet, setSelectedPlanet] = useState<Planets>();
+
   // 92vh to get rid of the scrollbar on the right.
   return (
     <div style={{width: "auto", height: "92vh"}}>
       <NavBar />
-      <Canvas camera={{ position: [0, 0, 100]  }}>
+      <Canvas camera={{ position: [0, 0, 100] }}>
         <Suspense fallback={null}>
           <Background />
         </Suspense>
-        <Lighting />
-        <SolarSystem />
+        <ambientLight />
+        <SolarSystem onClickHandler={(p) => setSelectedPlanet(p)} />
         <OrbitControls />
       </Canvas>
-      <Footer />
+      <Footer selectedPlanet={selectedPlanet} />
     </div>
   );
 }

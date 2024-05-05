@@ -8,6 +8,7 @@ export type EntityProps = BaseThreeMeshProps & {
   rotationSpeed: number;
   texture: string;
   revolutionSpeed?: number;
+  onClickHandler?: () => void;
 };
 
 export enum Planets {
@@ -19,4 +20,25 @@ export enum Planets {
   Saturn,
   Uranus,
   Neptune,
+}
+
+export const getPlanetName = (planet: Planets) => {
+  switch(planet) {
+    case Planets.Mercury:
+      return "Mercury";
+    case Planets.Venus:
+      return "Venus";
+    case Planets.Earth:
+      return "Earth";
+    case Planets.Mars:
+      return "Mars";
+    case Planets.Jupiter:
+      return "Jupiter";
+    case Planets.Saturn:
+      return "Saturn";
+    case Planets.Uranus:
+      return "Uranus";
+    case Planets.Neptune:
+      return "Neptune";
+  }
 }
