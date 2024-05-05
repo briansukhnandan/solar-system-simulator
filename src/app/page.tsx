@@ -99,6 +99,7 @@ const Moons = (props: BaseThreeMeshProps & {
 
             return (
               <EntityMesh
+                key={props.planetDistance}
                 name={"Moon"}
                 position={moonVector}
                 size={props.planetSize / 10}
