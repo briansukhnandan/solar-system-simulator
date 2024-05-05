@@ -1,9 +1,9 @@
 "use client"
 import * as THREE from "three";
 import * as Constants from "./utils/constants";
-import React, { useRef } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber"
-import { OrbitControls } from "@react-three/drei";
+import React, { Suspense, useRef } from "react";
+import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber"
+import { OrbitControls, useTexture } from "@react-three/drei";
 import { BaseThreeMeshProps, EntityProps, OrbitProps, Planets } from "./utils/types";
 
 const OrbitMesh = (props: OrbitProps) => {
@@ -15,7 +15,7 @@ const OrbitMesh = (props: OrbitProps) => {
       ref={ref}
     >
       <torusGeometry args={[props.radius, 0.01, 32, 256]} />
-      <meshBasicMaterial attach={"material"} color={'gray'} />
+      <meshBasicMaterial attach={"material"} color={'white'} />
     </mesh>
   );
 }
@@ -63,6 +63,8 @@ const Planet = <T extends Planets>({ planet }: { planet: T }) => {
     revolutionPeriod,
     texture
   } = Constants.PlanetInformationMap[planet];
+
+  const PLANET_SIZE_SCALE = 4;
   
   return (
     <group>
@@ -71,7 +73,7 @@ const Planet = <T extends Planets>({ planet }: { planet: T }) => {
         <EntityMesh
           name={name}
           position={[distance,0,0]}
-          size={size}
+          size={PLANET_SIZE_SCALE * size}
           rotationSpeed={rotationSpeed}
           texture={texture}
         />
@@ -83,10 +85,10 @@ const Planet = <T extends Planets>({ planet }: { planet: T }) => {
 const SolarSystem = () => {
   return (
     <>
-      <EntityMesh 
+      <EntityMesh
         name="Sun"
         position={[0,0,0]}
-        size={Constants.SUN_BASE_SIZE}
+        size={Constants.SUN_BASE_SIZE * 1.25}
         rotationSpeed={Constants.SUN_BASE_ROTATION_SPEED}
         texture="textures/sun.jpg"
       />
@@ -95,6 +97,9 @@ const SolarSystem = () => {
       <Planet planet={Planets.Earth} />
       <Planet planet={Planets.Mars} />
       <Planet planet={Planets.Jupiter} />
+      <Planet planet={Planets.Saturn} />
+      <Planet planet={Planets.Uranus} />
+      <Planet planet={Planets.Neptune} />
     </>
   );
 }
@@ -103,10 +108,24 @@ const Lighting = () => (
   <ambientLight />
 );
 
+const Background = () => {
+  const { gl } = useThree();
+  const texture = useTexture('textures/stars.jpg');
+  const formatted = new THREE.WebGLCubeRenderTarget(texture.image.height)
+    .fromEquirectangularTexture(gl, texture);
+
+  return(
+    <primitive attach="background" object={formatted.texture} />
+  )
+}
+
 export default function Home() {
   return (
     <div style={{width: "auto", height: "100vh"}}>
-      <Canvas camera={{ position: [0, 0, 30] }}>
+      <Canvas camera={{ position: [0, 0, 30]  }}>
+        <Suspense fallback={null}>
+          <Background />
+        </Suspense>
         <Lighting />
         <SolarSystem />
         <OrbitControls />

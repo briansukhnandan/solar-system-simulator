@@ -2,7 +2,7 @@ import { Planets } from "./types";
 
 export const UNIT_SIZE = 15;
 export const UNIT_ROTATION_SPEED = 0.0005;
-export const UNIT_REVOLUTION_SPEED = 0.0001;
+export const UNIT_REVOLUTION_SPEED = 0.001;
 
 export const SUN_BASE_SIZE = UNIT_SIZE;
 export const SUN_BASE_ROTATION_SPEED = UNIT_ROTATION_SPEED;
