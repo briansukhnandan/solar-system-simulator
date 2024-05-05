@@ -77,6 +77,15 @@ const Planet = <T extends Planets>({ planet }: { planet: T }) => {
           rotationSpeed={rotationSpeed}
           texture={texture}
         />
+        { planet === Planets.Saturn ? (
+          <mesh 
+            position={[distance, 0, 0]} 
+            rotation={[Math.PI / 4, 0, 0]}
+          >
+            <torusGeometry args={[7, 0.1, 32, 512]} />
+            <meshBasicMaterial attach={"material"} color={'grey'} />
+          </mesh>
+        ) : null}
       </RotatingAxis>
     </group>
   );
