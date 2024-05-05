@@ -13,6 +13,7 @@ export const PlanetInformationMap: Record<Planets, {
   size: number,
   rotationSpeed: number,
   revolutionPeriod: number,
+  moonCount: number,
   texture: string,
 }> = {
   [Planets.Mercury]: {
@@ -21,6 +22,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 150,
     rotationSpeed: UNIT_ROTATION_SPEED / 2.5,
     revolutionPeriod: UNIT_REVOLUTION_SPEED * 3,
+    moonCount: 0,
     texture: "textures/mercury.jpg",
   },
   [Planets.Venus]: {
@@ -29,6 +31,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 60,
     rotationSpeed: SUN_BASE_ROTATION_SPEED / 10,
     revolutionPeriod: UNIT_REVOLUTION_SPEED * 1.62,
+    moonCount: 0,
     texture: "textures/venus.jpg",
   },
   [Planets.Earth]: {
@@ -37,6 +40,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 55,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 27,
     revolutionPeriod: UNIT_REVOLUTION_SPEED,
+    moonCount: 1,
     texture: "textures/earth.jpg",
   },
   [Planets.Mars]: {
@@ -45,6 +49,7 @@ export const PlanetInformationMap: Record<Planets, {
     size:  SUN_BASE_SIZE / 70,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 28.5,
     revolutionPeriod: UNIT_REVOLUTION_SPEED / 1.8,
+    moonCount: 2,
     texture: "textures/mars.jpg",
   },
   [Planets.Jupiter]: {
@@ -53,6 +58,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 10,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 60,
     revolutionPeriod: UNIT_REVOLUTION_SPEED / 12,
+    moonCount: 95,
     texture: "textures/jupiter.jpg",
   },
   [Planets.Saturn]: {
@@ -61,6 +67,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 12,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 67,
     revolutionPeriod: UNIT_REVOLUTION_SPEED / 29.4,
+    moonCount: 146,
     texture: "textures/saturn.jpg",
   },
   [Planets.Uranus]: {
@@ -69,6 +76,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 26,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 34,
     revolutionPeriod: UNIT_REVOLUTION_SPEED / 84,
+    moonCount: 28,
     texture: "textures/uranus.jpg",
   },
   [Planets.Neptune]: {
@@ -77,14 +85,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 27,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 32,
     revolutionPeriod: UNIT_REVOLUTION_SPEED / 165,
+    moonCount: 16,
     texture: "textures/neptune.jpg",
-  },
-  [Planets.Pluto]: {
-    name: "Pluto",
-    distance: 40 * UNIT_SIZE,
-    size: SUN_BASE_SIZE / 250,
-    rotationSpeed: SUN_BASE_ROTATION_SPEED * 27 / 6, 
-    revolutionPeriod: UNIT_REVOLUTION_SPEED / 248,
-    texture: "TODO",
   },
 }

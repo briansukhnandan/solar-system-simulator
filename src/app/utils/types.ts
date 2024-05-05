@@ -19,5 +19,4 @@ export enum Planets {
   Saturn,
   Uranus,
   Neptune,
-  Pluto
 }

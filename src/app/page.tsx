@@ -2,7 +2,7 @@
 import * as THREE from "three";
 import * as Constants from "./utils/constants";
 import React, { Suspense, useRef } from "react";
-import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber"
+import { Canvas, Vector3, useFrame, useLoader, useThree } from "@react-three/fiber"
 import { OrbitControls, useTexture } from "@react-three/drei";
 import { BaseThreeMeshProps, EntityProps, OrbitProps, Planets } from "./utils/types";
 
@@ -54,6 +54,65 @@ const RotatingAxis = (props: BaseThreeMeshProps & { revolutionSpeed: number, chi
   );
 }
 
+/** A version of RotatingAxis sans the roation logic. */
+const PivotObject = (props: BaseThreeMeshProps) => {
+  const ref = useRef<THREE.Mesh>(null!)
+  return (
+    <mesh
+      {...props}
+      ref={ref}
+    >
+      <sphereGeometry args={[1]} />
+      { props.children }
+    </mesh>
+  );
+}
+
+const Moons = (props: BaseThreeMeshProps & {
+  planetSize: number,
+  planetDistance: number,
+  moonCount: number
+}) => {
+  const BASE_MOON_TEXTURE = "textures/earth_moon.jpg";
+  const FINAL_MOON_COUNT = Math.min(5, props.moonCount);
+  const getRandomInt = (min: number, max: number) => {
+    const minCeiled = Math.ceil(min);
+    const maxFloored = Math.floor(max);
+    return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
+  }
+
+  if (!props.moonCount) {
+    return null;
+  }
+
+  return (
+    <group>
+      <PivotObject position={props.position}>
+        {
+          Array.from(Array(FINAL_MOON_COUNT), () => ({})).map(_ => {
+            const randomIsNegative = [-1, 1][Math.floor(Math.random() * 2)];
+            const moonVector: Vector3 = [
+              props.planetDistance + randomIsNegative * (getRandomInt(-1*props.planetSize, props.planetSize) + 2*props.planetSize),
+              randomIsNegative * (getRandomInt(-1 * props.planetSize, props.planetSize) + props.planetSize),
+              randomIsNegative * getRandomInt(-1 * props.planetSize, props.planetSize) + props.planetSize
+            ];
+
+            return (
+              <EntityMesh
+                name={"Moon"}
+                position={moonVector}
+                size={props.planetSize / 10}
+                rotationSpeed={0.01}
+                texture={BASE_MOON_TEXTURE}
+              />
+            );
+          })
+        }
+      </PivotObject>
+    </group>
+  )
+}
+
 const Planet = <T extends Planets>({ planet }: { planet: T }) => {
   const {
     name,
@@ -61,10 +120,12 @@ const Planet = <T extends Planets>({ planet }: { planet: T }) => {
     size, 
     rotationSpeed, 
     revolutionPeriod,
-    texture
+    texture,
+    moonCount,
   } = Constants.PlanetInformationMap[planet];
 
   const PLANET_SIZE_SCALE = 4;
+  const PLANET_DISTANCE: Vector3 = [distance, 0, 0];
   
   return (
     <group>
@@ -72,11 +133,17 @@ const Planet = <T extends Planets>({ planet }: { planet: T }) => {
       <RotatingAxis revolutionSpeed={revolutionPeriod}>
         <EntityMesh
           name={name}
-          position={[distance,0,0]}
+          position={PLANET_DISTANCE}
           size={PLANET_SIZE_SCALE * size}
           rotationSpeed={rotationSpeed}
           texture={texture}
         />
+        <Moons
+          moonCount={moonCount}
+          planetSize={PLANET_SIZE_SCALE * size}
+          planetDistance={distance}
+        />
+        {/** Render Saturn's ring */}
         { planet === Planets.Saturn ? (
           <mesh 
             position={[distance, 0, 0]} 
@@ -131,7 +198,7 @@ const Background = () => {
 export default function Home() {
   return (
     <div style={{width: "auto", height: "100vh"}}>
-      <Canvas camera={{ position: [0, 0, 30]  }}>
+      <Canvas camera={{ position: [0, 0, 100]  }}>
         <Suspense fallback={null}>
           <Background />
         </Suspense>
