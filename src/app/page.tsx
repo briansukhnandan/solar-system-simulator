@@ -116,9 +116,9 @@ const Moons = (props: BaseThreeMeshProps & {
 const Planet = <T extends Planets>({ planet }: { planet: T }) => {
   const {
     name,
-    distance, 
-    size, 
-    rotationSpeed, 
+    distance,
+    size,
+    rotationSpeed,
     revolutionPeriod,
     texture,
     moonCount,
