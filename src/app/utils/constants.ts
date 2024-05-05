@@ -2,7 +2,7 @@ import { Planets } from "./types";
 
 export const UNIT_SIZE = 15;
 export const UNIT_ROTATION_SPEED = 0.0005;
-export const UNIT_REVOLUTION_SPEED = 1;
+export const UNIT_REVOLUTION_SPEED = 0.0001;
 
 export const SUN_BASE_SIZE = UNIT_SIZE;
 export const SUN_BASE_ROTATION_SPEED = UNIT_ROTATION_SPEED;
@@ -53,7 +53,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 10,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 60,
     revolutionPeriod: UNIT_REVOLUTION_SPEED / 12,
-    texture: "TODO",
+    texture: "textures/jupiter.jpg",
   },
   [Planets.Saturn]: {
     name: "Saturn",
@@ -61,7 +61,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 12,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 67,
     revolutionPeriod: UNIT_REVOLUTION_SPEED / 29.4,
-    texture: "TODO",
+    texture: "textures/saturn.jpg",
   },
   [Planets.Uranus]: {
     name: "Uranus",
@@ -69,7 +69,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 26,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 34,
     revolutionPeriod: UNIT_REVOLUTION_SPEED / 84,
-    texture: "TODO",
+    texture: "textures/uranus.jpg",
   },
   [Planets.Neptune]: {
     name: "Neptune",
@@ -77,7 +77,7 @@ export const PlanetInformationMap: Record<Planets, {
     size: SUN_BASE_SIZE / 27,
     rotationSpeed: SUN_BASE_ROTATION_SPEED * 32,
     revolutionPeriod: UNIT_REVOLUTION_SPEED / 165,
-    texture: "TODO",
+    texture: "textures/neptune.jpg",
   },
   [Planets.Pluto]: {
     name: "Pluto",

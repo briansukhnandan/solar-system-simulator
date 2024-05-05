@@ -4,7 +4,7 @@ import * as Constants from "./utils/constants";
 import React, { useRef } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei";
-import { EntityProps, OrbitProps, Planets } from "./utils/types";
+import { BaseThreeMeshProps, EntityProps, OrbitProps, Planets } from "./utils/types";
 
 const OrbitMesh = (props: OrbitProps) => {
   const ref = useRef<THREE.Mesh>(null!)
@@ -20,7 +20,7 @@ const OrbitMesh = (props: OrbitProps) => {
   );
 }
 
-const EntityMesh = (props: EntityProps & { children?: React.ReactNode }) => {
+const EntityMesh = (props: EntityProps) => {
   const ref = useRef<THREE.Mesh>(null!)
   const colorMap = useLoader(THREE.TextureLoader, props.texture)
   
@@ -32,10 +32,23 @@ const EntityMesh = (props: EntityProps & { children?: React.ReactNode }) => {
     <mesh
       {...props}
       ref={ref}
-      rotation={[Math.PI / 2, 0, 0]}
     >
       <sphereGeometry args={[props.size]} />
       <meshStandardMaterial map={colorMap}/>
+    </mesh>
+  );
+}
+
+const RotatingAxis = (props: BaseThreeMeshProps & { revolutionSpeed: number, children?: React.ReactNode }) => {
+  const ref = useRef<THREE.Mesh>(null!)
+  useFrame((_state, _delta) => (ref.current.rotation.y += props.revolutionSpeed))
+  return (
+    <mesh
+      {...props}
+      ref={ref}
+      rotation={[Math.PI / 2, 0, 0]}
+    >
+      <sphereGeometry args={[1]} />
       { props.children }
     </mesh>
   );
@@ -52,16 +65,18 @@ const Planet = <T extends Planets>({ planet }: { planet: T }) => {
   } = Constants.PlanetInformationMap[planet];
   
   return (
-    <>
+    <group>
       <OrbitMesh radius={distance} position={[0,0,0]}/>
-      <EntityMesh
-        name={name}
-        position={[distance,0,0]}
-        size={size}
-        rotationSpeed={rotationSpeed}
-        texture={texture}
-      />
-    </>
+      <RotatingAxis revolutionSpeed={revolutionPeriod}>
+        <EntityMesh
+          name={name}
+          position={[distance,0,0]}
+          size={size}
+          rotationSpeed={rotationSpeed}
+          texture={texture}
+        />
+      </RotatingAxis>
+    </group>
   );
 }
 
@@ -79,6 +94,7 @@ const SolarSystem = () => {
       <Planet planet={Planets.Venus} />
       <Planet planet={Planets.Earth} />
       <Planet planet={Planets.Mars} />
+      <Planet planet={Planets.Jupiter} />
     </>
   );
 }
@@ -86,7 +102,6 @@ const SolarSystem = () => {
 const Lighting = () => (
   <ambientLight />
 );
-
 
 export default function Home() {
   return (
