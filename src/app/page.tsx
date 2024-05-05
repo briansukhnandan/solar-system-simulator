@@ -244,7 +244,7 @@ export default function Home() {
   return (
     <div style={{width: "auto", height: "92vh"}}>
       <NavBar />
-      <Canvas camera={{ position: [0, 0, 100] }}>
+      <Canvas camera={{ position: [0, -100, 100] }}>
         <Suspense fallback={null}>
           <Background />
         </Suspense>
